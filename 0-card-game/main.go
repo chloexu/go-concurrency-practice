@@ -87,7 +87,7 @@ func main() {
 			fmt.Printf("\n************* About to start Round #%v *************\n\n", r+1)
 			// for each round, have each player start the round to get the score
 			for _, player := range players {
-				player.Play()
+				go player.Play()
 			}
 			// then end the round after all players finish playing
 			EndRound(players, c)
