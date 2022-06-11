@@ -1,8 +1,8 @@
 ## About
 
-This is a example code practicing interface in golang mocking the players' activity on different types of plants in Animal Crossing game. 
+This is some example code practicing interface in golang mocking the players' activity on different types of plants in Animal Crossing game. 
 
-There are 3 interface defined, `Shakeable`, `Choppable`, and `Diggable`. Different plant type and size can choose to implement one or more of these interfaces and call the defined methods.
+There are 3 interfaces defined, `Shakeable`, `Choppable`, and `Diggable`. Different plant type and size can choose to implement one or more of these interfaces and call the defined methods.
 
 ## Rules
 
