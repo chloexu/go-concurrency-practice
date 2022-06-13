@@ -7,13 +7,15 @@ import (
 )
 
 type Player struct {
-	name        string
-	latestDraw  int
-	latestScore int
-	totalScore  int
+	name         string
+	latestDraw   int
+	latestScore  int
+	totalScore   int
+	currentRound int
 }
 
-func (p *Player) Play() {
+func (p *Player) Play(c chan *Player, round int) {
+	p.currentRound = round
 	rand.Seed(time.Now().UnixNano())
 	draw := rand.Intn(13) + 1
 	var rs int
@@ -36,20 +38,15 @@ func (p *Player) Play() {
 	p.latestDraw = draw
 	p.latestScore = rs
 	p.totalScore += rs
-}
-
-func EndRound(players []*Player, c chan *Player) {
-	for _, player := range players {
-		c <- player
-	}
+	c <- p
 }
 
 func Monitor(c chan *Player, q chan *Player) {
 	for {
 		select {
 		case player := <-c:
-			fmt.Printf("-------- Player %v: | draw [%v] | score [%v] | ====> total score %v\n",
-				player.name, player.latestDraw, player.latestScore, player.totalScore)
+			fmt.Printf("-------- Round %v === Player %v: | draw [%v] | score [%v] | ====> total score %v\n",
+				player.currentRound, player.name, player.latestDraw, player.latestScore, player.totalScore)
 		case winner := <-q:
 			fmt.Printf("\n************* Game over! Winner is %v with a total score of %v, Congrats!\n\n",
 				winner.name, winner.totalScore)
@@ -81,20 +78,19 @@ func main() {
 		{name: "Laurence", totalScore: 0},
 	}
 	rounds := make([]int, 10)
-
+	t1 := time.Now()
 	go func() {
 		for r := range rounds {
-			fmt.Printf("\n************* About to start Round #%v *************\n\n", r+1)
-			// for each round, have each player start the round to get the score
+			// for each round, have all players start playing concurrently
 			for _, player := range players {
-				go player.Play()
+				go player.Play(c, r)
 			}
-			// then end the round after all players finish playing
-			EndRound(players, c)
-			// sleep for 5 seconds before proceeding to the next round
+			// sleep for 1 seconds before proceeding to the next round
 			time.Sleep(1 * time.Second)
 		}
 		AnounceWinner(players, q)
 	}()
 	Monitor(c, q)
+	t2 := time.Now()
+	fmt.Println(t2.Sub(t1))
 }
