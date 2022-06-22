@@ -10,6 +10,7 @@ import (
 // var c = make(chan int)
 
 // buffered channel: send (c <- 0) can happen before receive (<-c) is ready as long as buffer capacity is not reached
+// however, the receive operation will block the code if it finds the buffer to be empty, i.e. receive happens before any sending operations
 var c = make(chan int, 1)
 
 var a string
